@@ -1,54 +1,37 @@
-# Copyright 2017 by the contributors
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
-
----
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'QS(5042) Kubernetes AWS CloudFormation Template: Create a Kubernetes
-  cluster in a new VPC. The master node is an auto-recovering Amazon EC2
-  instance. 1-20 additional EC2 instances in an AutoScalingGroup join the
-  Kubernetes cluster as nodes. An ELB provides configurable external access
-  to the Kubernetes API. The new VPC includes a bastion host to grant
-  SSH access to the private subnet for the cluster. This template creates
-  two stacks: one for the new VPC and one for the cluster. The stack is
-  suitable for development and small single-team clusters. **WARNING** This
-  template creates four Amazon EC2 instances with default settings. You will
-  be billed for the AWS resources used if you create a stack from this template.
-  **SUPPORT** Please visit http://jump.heptio.com/aws-qs-help for support.
-  **NEXT STEPS** Please visit http://jump.heptio.com/aws-qs-next.'
-
-# The Metadata tells AWS how to display the parameters during stack creation
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  QS(5042) Kubernetes AWS CloudFormation Template: Create a Kubernetes cluster
+  in a new VPC. The master node is an auto-recovering Amazon EC2 instance. 1-20
+  additional EC2 instances in an AutoScalingGroup join the Kubernetes cluster as
+  nodes. An ELB provides configurable external access to the Kubernetes API. The
+  new VPC includes a bastion host to grant SSH access to the private subnet for
+  the cluster. This template creates two stacks: one for the new VPC and one for
+  the cluster. The stack is suitable for development and small single-team
+  clusters. **WARNING** This template creates four Amazon EC2 instances with
+  default settings. You will be billed for the AWS resources used if you create
+  a stack from this template. **SUPPORT** Please visit
+  http://jump.heptio.com/aws-qs-help for support. **NEXT STEPS** Please visit
+  http://jump.heptio.com/aws-qs-next.
 Metadata:
-  AWS::CloudFormation::Interface:
+  'AWS::CloudFormation::Interface':
     ParameterGroups:
-    - Label:
-        default: Required
-      Parameters:
-      - AvailabilityZone
-      - AdminIngressLocation
-      - KeyName
-    - Label:
-        default: Advanced
-      Parameters:
-      - ClusterDNSProvider
-      - NetworkingProvider
-      - K8sNodeCapacity
-      - InstanceType
-      - DiskSizeGb
-      - BastionInstanceType
-      - QSS3BucketName
-      - QSS3KeyPrefix
-
+      - Label:
+          default: Required
+        Parameters:
+          - AvailabilityZone
+          - AdminIngressLocation
+          - KeyName
+      - Label:
+          default: Advanced
+        Parameters:
+          - ClusterDNSProvider
+          - NetworkingProvider
+          - K8sNodeCapacity
+          - InstanceType
+          - DiskSizeGb
+          - BastionInstanceType
+          - QSS3BucketName
+          - QSS3KeyPrefix
     ParameterLabels:
       KeyName:
         default: SSH Key
@@ -72,205 +55,196 @@ Metadata:
         default: Networking Provider
       ClusterDNSProvider:
         default: Cluster DNS Provider
-
-
-# The Parameters allow the user to pass custom settings to the stack before creation
 Parameters:
   KeyName:
     Description: Existing EC2 KeyPair for SSH access.
-    Type: AWS::EC2::KeyPair::KeyName
+    Type: 'AWS::EC2::KeyPair::KeyName'
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
-    Default: "{KeyName}"
-
+    Default: '{KeyName}'
   InstanceType:
     Description: EC2 instance type for the cluster.
     Type: String
     Default: t2.micro
     AllowedValues:
-    - t1.micro
-    - t2.nano
-    - t2.micro
-    - t2.small
-    - t2.medium
-    - t2.large
-    - t2.xlarge
-    - t2.2xlarge
-    - m1.small
-    - m1.medium
-    - m1.large
-    - m1.xlarge
-    - m3.medium
-    - m3.large
-    - m3.xlarge
-    - m3.2xlarge
-    - m4.large
-    - m4.xlarge
-    - m4.2xlarge
-    - m4.4xlarge
-    - m4.10xlarge
-    - m4.16xlarge
-    - m2.xlarge
-    - m2.2xlarge
-    - m2.4xlarge
-    - r3.large
-    - r3.xlarge
-    - r3.2xlarge
-    - r3.4xlarge
-    - r3.8xlarge
-    - r4.large
-    - r4.xlarge
-    - r4.2xlarge
-    - r4.4xlarge
-    - r4.8xlarge
-    - r4.16xlarge
-    - x1.16xlarge
-    - x1.32xlarge
-    - i2.xlarge
-    - i2.2xlarge
-    - i2.4xlarge
-    - i2.8xlarge
-    - i3.large
-    - i3.xlarge
-    - i3.2xlarge
-    - i3.4xlarge
-    - i3.8xlarge
-    - i3.16xlarge
-    - c1.medium
-    - c1.xlarge
-    - c3.large
-    - c3.xlarge
-    - c3.2xlarge
-    - c3.4xlarge
-    - c3.8xlarge
-    - c4.large
-    - c4.xlarge
-    - c4.2xlarge
-    - c4.4xlarge
-    - c4.8xlarge
-    - g2.2xlarge
-    - g2.8xlarge
-    - g3.4xlarge
-    - g3.8xlarge
-    - g3.16xlarge
-    - p2.xlarge
-    - p2.8xlarge
-    - p2.16xlarge
-    - d2.xlarge
-    - d2.2xlarge
-    - d2.4xlarge
-    - d2.8xlarge
-    - f1.2xlarge
-    - f1.16xlarge
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - m1.small
+      - m1.medium
+      - m1.large
+      - m1.xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m2.xlarge
+      - m2.2xlarge
+      - m2.4xlarge
+      - r3.large
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - x1.16xlarge
+      - x1.32xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - i3.large
+      - i3.xlarge
+      - i3.2xlarge
+      - i3.4xlarge
+      - i3.8xlarge
+      - i3.16xlarge
+      - c1.medium
+      - c1.xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - g2.2xlarge
+      - g2.8xlarge
+      - g3.4xlarge
+      - g3.8xlarge
+      - g3.16xlarge
+      - p2.xlarge
+      - p2.8xlarge
+      - p2.16xlarge
+      - d2.xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - f1.2xlarge
+      - f1.16xlarge
     ConstraintDescription: must be a valid EC2 instance type.
-
-  # Specifies the size of the root disk for all EC2 instances, including master
-  # and nodes.
   DiskSizeGb:
     Description: 'Size of the root disk for the EC2 instances, in GiB.  Default: 40'
     Default: 8
     Type: Number
     MinValue: 8
     MaxValue: 1024
-
   BastionInstanceType:
     Description: EC2 instance type for the bastion host (used for public SSH access).
     Type: String
     Default: t2.micro
     AllowedValues:
-    - t1.micro
-    - t2.nano
-    - t2.micro
-    - t2.small
-    - t2.medium
-    - t2.large
-    - t2.xlarge
-    - t2.2xlarge
-    - m1.small
-    - m1.medium
-    - m1.large
-    - m1.xlarge
-    - m3.medium
-    - m3.large
-    - m3.xlarge
-    - m3.2xlarge
-    - m4.large
-    - m4.xlarge
-    - m4.2xlarge
-    - m4.4xlarge
-    - m4.10xlarge
-    - m4.16xlarge
-    - m2.xlarge
-    - m2.2xlarge
-    - m2.4xlarge
-    - r3.large
-    - r3.xlarge
-    - r3.2xlarge
-    - r3.4xlarge
-    - r3.8xlarge
-    - r4.large
-    - r4.xlarge
-    - r4.2xlarge
-    - r4.4xlarge
-    - r4.8xlarge
-    - r4.16xlarge
-    - x1.16xlarge
-    - x1.32xlarge
-    - i2.xlarge
-    - i2.2xlarge
-    - i2.4xlarge
-    - i2.8xlarge
-    - i3.large
-    - i3.xlarge
-    - i3.2xlarge
-    - i3.4xlarge
-    - i3.8xlarge
-    - i3.16xlarge
-    - c1.medium
-    - c1.xlarge
-    - c3.large
-    - c3.xlarge
-    - c3.2xlarge
-    - c3.4xlarge
-    - c3.8xlarge
-    - c4.large
-    - c4.xlarge
-    - c4.2xlarge
-    - c4.4xlarge
-    - c4.8xlarge
-    - g2.2xlarge
-    - g2.8xlarge
-    - g3.4xlarge
-    - g3.8xlarge
-    - g3.16xlarge
-    - p2.xlarge
-    - p2.8xlarge
-    - p2.16xlarge
-    - d2.xlarge
-    - d2.2xlarge
-    - d2.4xlarge
-    - d2.8xlarge
-    - f1.2xlarge
-    - f1.16xlarge
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - m1.small
+      - m1.medium
+      - m1.large
+      - m1.xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m2.xlarge
+      - m2.2xlarge
+      - m2.4xlarge
+      - r3.large
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - x1.16xlarge
+      - x1.32xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - i3.large
+      - i3.xlarge
+      - i3.2xlarge
+      - i3.4xlarge
+      - i3.8xlarge
+      - i3.16xlarge
+      - c1.medium
+      - c1.xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - g2.2xlarge
+      - g2.8xlarge
+      - g3.4xlarge
+      - g3.8xlarge
+      - g3.16xlarge
+      - p2.xlarge
+      - p2.8xlarge
+      - p2.16xlarge
+      - d2.xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - f1.2xlarge
+      - f1.16xlarge
     ConstraintDescription: must be a valid EC2 instance type.
-
   AvailabilityZone:
-    Description: The Availability Zone for this cluster. Heptio recommends
-      that you run one cluster per AZ and use tooling to coordinate across AZs.
-    Type: AWS::EC2::AvailabilityZone::Name
+    Description: >-
+      The Availability Zone for this cluster. Heptio recommends that you run one
+      cluster per AZ and use tooling to coordinate across AZs.
+    Type: 'AWS::EC2::AvailabilityZone::Name'
     ConstraintDescription: must be the name of an AWS Availability Zone
     Default: us-west-2a
-
   AdminIngressLocation:
-    Description: CIDR block (IP address range) to allow SSH access to the
-      bastion host and HTTPS access to the Kubernetes API. Use 0.0.0.0/0
-      to allow access from all locations.
+    Description: >-
+      CIDR block (IP address range) to allow SSH access to the bastion host and
+      HTTPS access to the Kubernetes API. Use 0.0.0.0/0 to allow access from all
+      locations.
     Type: String
     MinLength: '9'
     MaxLength: '18'
-    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
-    Default: '0.0.0.0/0'
-
+    Default: 0.0.0.0/0
   K8sNodeCapacity:
     Default: '3'
     Description: Initial number of Kubernetes nodes (1-20).
@@ -278,62 +252,67 @@ Parameters:
     MinValue: '1'
     MaxValue: '20'
     ConstraintDescription: must be between 1 and 20 EC2 instances.
-
-  # S3 Bucket configuration: allows users to use their own downstream snapshots
-  # of the quickstart-aws-vpc and quickstart-linux-bastion templates
   QSS3BucketName:
-    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
-      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
-      (-).
-
+    AllowedPattern: '^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$'
+    ConstraintDescription: >-
+      Quick Start bucket name can include numbers, lowercase letters, uppercase
+      letters, and hyphens (-). It cannot start or end with a hyphen (-).
     Default: clouda-labs-assets
-    Description: Only change this if you have set up assets, like your own networking
+    Description: >-
+      Only change this if you have set up assets, like your own networking
       configuration, in an S3 bucket. S3 bucket name for the Quick Start assets.
       Quick Start bucket name can include numbers, lowercase letters, uppercase
       letters, and hyphens (-). It cannot start or end with a hyphen (-).
     Type: String
-
   QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase 
-      letters, uppercase letters, hyphens (-), and forward slash (/).
+    AllowedPattern: '^[0-9a-zA-Z-/]*$'
+    ConstraintDescription: >-
+      Quick Start key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/).
     Default: k8s-quickstart-heptio/1-10-3/
-    Description: Only change this if you have set up assets in an S3 bucket, as explained
+    Description: >-
+      Only change this if you have set up assets in an S3 bucket, as explained
       in the S3 Bucket parameter. S3 key prefix for the Quick Start assets.
       Quick Start key prefix can include numbers, lowercase letters, uppercase
       letters, hyphens (-), and forward slash (/).
     Type: String
-
   NetworkingProvider:
     AllowedValues:
-    - calico
-    - weave
-    ConstraintDescription: 'Currently supported values are "calico" and "weave"'
+      - calico
+      - weave
+    ConstraintDescription: Currently supported values are "calico" and "weave"
     Default: calico
-    Description: Choose the networking provider to use for communication between
-      pods in the Kubernetes cluster. Supported configurations are calico
+    Description: >-
+      Choose the networking provider to use for communication between pods in
+      the Kubernetes cluster. Supported configurations are calico
       (https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubeadm/)
-      and weave (https://github.com/weaveworks/weave/blob/master/site/kubernetes/kube-addon.md).
+      and weave
+      (https://github.com/weaveworks/weave/blob/master/site/kubernetes/kube-addon.md).
     Type: String
-
   ClusterDNSProvider:
     AllowedValues:
-    - CoreDNS
-    - KubeDNS
-    ConstraintDescription: 'Currently supported values are "CoreDNS" and "KubeDNS"'
+      - CoreDNS
+      - KubeDNS
+    ConstraintDescription: Currently supported values are "CoreDNS" and "KubeDNS"
     Default: KubeDNS
-    Description: Choose the cluster DNS provider to use for internal cluster DNS. Supported
+    Description: >-
+      Choose the cluster DNS provider to use for internal cluster DNS. Supported
       configurations are CoreDNS and KubeDNS
     Type: String
-
   LoadBalancerType:
-    Description:  Create Internet-facing (public, external) or Internal-facing Load Balancers
+    Description: >-
+      Create Internet-facing (public, external) or Internal-facing Load
+      Balancers
     Type: String
     Default: internet-facing
-    AllowedValues: [ "internet-facing", "internal" ]
-
+    AllowedValues:
+      - internet-facing
+      - internal
 Mappings:
+  UserConfig:
+    Login:
+      'Name': student
+      'Pass': password
   RegionMap:
     ap-northeast-1:
       '64': ami-891deff6
@@ -365,7 +344,6 @@ Mappings:
       '64': ami-fef48b86
     us-east-1:
       '64': ami-569d0529
-
   BastionRegionMap:
     ap-northeast-1:
       '64': ami-d39a02b5
@@ -399,300 +377,268 @@ Mappings:
       '64': ami-1ee65166
 Conditions:
   UsEast1Condition:
-    Fn::Equals:
-    - !Ref AWS::Region
-    - "us-east-1"
-
+    'Fn::Equals':
+      - !Ref 'AWS::Region'
+      - us-east-1
 Resources:
   ClusterInfoBucket:
-    Type: AWS::S3::Bucket
+    Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: Private
       Tags:
-      - Key: KubernetesCluster
-        Value: !Ref AWS::StackName
-
-  # Resources for new VPC
+        - Key: KubernetesCluster
+          Value: !Ref 'AWS::StackName'
   VPC:
-    Type: AWS::EC2::VPC
+    Type: 'AWS::EC2::VPC'
     Properties:
-      CidrBlock: '10.0.0.0/16'
+      CidrBlock: 10.0.0.0/16
       EnableDnsSupport: 'true'
       EnableDnsHostnames: 'true'
       Tags:
-      - Key: Name
-        Value: 'k8s-lab'
-
+        - Key: Name
+          Value: k8s-lab
   DHCPOptions:
-    Type: AWS::EC2::DHCPOptions
+    Type: 'AWS::EC2::DHCPOptions'
     Properties:
       DomainName:
-        # us-east-1 needs .ec2.internal, the rest of the regions get <region>.compute.internal.
-        # See http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html
-        Fn::If:
-        - UsEast1Condition
-        - "ec2.internal"
-        - !Sub "${AWS::Region}.compute.internal"
+        'Fn::If':
+          - UsEast1Condition
+          - ec2.internal
+          - !Sub '${AWS::Region}.compute.internal'
       DomainNameServers:
-      - AmazonProvidedDNS
-
+        - AmazonProvidedDNS
   VPCDHCPOptionsAssociation:
-    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Type: 'AWS::EC2::VPCDHCPOptionsAssociation'
     Properties:
       VpcId: !Ref VPC
       DhcpOptionsId: !Ref DHCPOptions
-
   InternetGateway:
-    Type: AWS::EC2::InternetGateway
+    Type: 'AWS::EC2::InternetGateway'
     Properties:
       Tags:
-      - Key: Network
-        Value: Public
-
+        - Key: Network
+          Value: Public
   VPCGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
+    Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
-
   PrivateSubnet:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: '10.0.0.0/19'
+      CidrBlock: 10.0.0.0/19
       AvailabilityZone: !Ref AvailabilityZone
       Tags:
-      - Key: Name
-        Value: Private subnet
-      - Key: Network
-        Value: Private
-
+        - Key: Name
+          Value: Private subnet
+        - Key: Network
+          Value: Private
   PublicSubnet:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: '10.0.128.0/20'
+      CidrBlock: 10.0.128.0/20
       AvailabilityZone: !Ref AvailabilityZone
       Tags:
-      - Key: Name
-        Value: Public subnet
-      - Key: Network
-        Value: Public
-      - Key: KubernetesCluster
-        Value: !Ref AWS::StackName
+        - Key: Name
+          Value: Public subnet
+        - Key: Network
+          Value: Public
+        - Key: KubernetesCluster
+          Value: !Ref 'AWS::StackName'
       MapPublicIpOnLaunch: true
-
-  # The NAT IP for the private subnet, as seen from within the public one
   NATEIP:
     DependsOn: VPCGatewayAttachment
-    Type: AWS::EC2::EIP
+    Type: 'AWS::EC2::EIP'
     Properties:
       Domain: vpc
-
-  # The NAT gateway for the private subnet
   NATGateway:
     DependsOn: VPCGatewayAttachment
-    Type: AWS::EC2::NatGateway
+    Type: 'AWS::EC2::NatGateway'
     Properties:
       AllocationId: !GetAtt NATEIP.AllocationId
       SubnetId: !Ref PublicSubnet
-
   PrivateSubnetRouteTable:
-    Type: AWS::EC2::RouteTable
+    Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref VPC
       Tags:
-      - Key: Name
-        Value: Private subnets
-      - Key: Network
-        Value: Private
-
+        - Key: Name
+          Value: Private subnets
+        - Key: Network
+          Value: Private
   PrivateSubnetRoute:
     DependsOn: VPCGatewayAttachment
-    Type: AWS::EC2::Route
+    Type: 'AWS::EC2::Route'
     Properties:
       RouteTableId: !Ref PrivateSubnetRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NATGateway
-
   PrivateSubnetRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       SubnetId: !Ref PrivateSubnet
       RouteTableId: !Ref PrivateSubnetRouteTable
-
   PublicSubnetRouteTable:
-    Type: AWS::EC2::RouteTable
+    Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref VPC
       Tags:
-      - Key: Name
-        Value: Public Subnets
-      - Key: Network
-        Value: Public
-
+        - Key: Name
+          Value: Public Subnets
+        - Key: Network
+          Value: Public
   PublicSubnetRoute:
     DependsOn: VPCGatewayAttachment
-    Type: AWS::EC2::Route
+    Type: 'AWS::EC2::Route'
     Properties:
       RouteTableId: !Ref PublicSubnetRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
-
   PublicSubnetRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       SubnetId: !Ref PublicSubnet
       RouteTableId: !Ref PublicSubnetRouteTable
-
-  # Taken from github.com/aws-quickstart/quickstart-linux-bastion.  We don't
-  # call it directly because that quickstart forces 2 bastion hosts and we only
-  # want one
   BastionHost:
-    Type: AWS::EC2::Instance
+    Type: 'AWS::EC2::Instance'
     Properties:
       ImageId:
-        Fn::FindInMap:
-        - BastionRegionMap
-        - Ref: AWS::Region
-        - '64'
+        'Fn::FindInMap':
+          - BastionRegionMap
+          - Ref: 'AWS::Region'
+          - '64'
       InstanceType: !Ref BastionInstanceType
       IamInstanceProfile: !Ref BastionInstanceProfile
       NetworkInterfaces:
-      - AssociatePublicIpAddress: true
-        DeleteOnTermination: true
-        DeviceIndex: 0
-        SubnetId: !Ref PublicSubnet
-        # This address is chosen because our public subnet begins at 10.0.128.0/20
-        PrivateIpAddress: '10.0.128.5'
-        GroupSet:
-        - Ref: BastionSecurityGroup
+        - AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          DeviceIndex: 0
+          SubnetId: !Ref PublicSubnet
+          PrivateIpAddress: 10.0.128.5
+          GroupSet:
+            - Ref: BastionSecurityGroup
       Tags:
-      - Key: Name
-        Value: "bastion-host  (SSH user: ubuntu)"
+        - Key: Name
+          Value: 'bastion-host  (SSH user: ubuntu)'
       KeyName: !Ref KeyName
       UserData:
-        Fn::Base64:
-          Fn::Sub: |
+        'Fn::Base64':
+          'Fn::Sub': >
             #!/bin/bash
 
+
             BASTION_BOOTSTRAP_FILE=bastion_bootstrap.sh
+
             BASTION_BOOTSTRAP=https://s3.amazonaws.com/aws-quickstart/quickstart-linux-bastion/scripts/bastion_bootstrap.sh
 
+
             curl -s -o $BASTION_BOOTSTRAP_FILE $BASTION_BOOTSTRAP
+
             chmod +x $BASTION_BOOTSTRAP_FILE
 
+
             # This gets us far enough in the bastion script to be useful.
+
             apt-get -y update && apt-get -y install python-pip
+
             pip install --upgrade pip &> /dev/null
 
-            ./$BASTION_BOOTSTRAP_FILE --banner https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/banner_message.txt --enable true
+
+            ./$BASTION_BOOTSTRAP_FILE --banner
+            https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/banner_message.txt
+            --enable true
+
 
             snap install kubectl --classic --channel=1.10/stable
-  
-  # IAM role for the bastion node http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
   BastionRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-          - sts:AssumeRole
-      Path: "/"
-      # IAM policy for the bastion node that allows specific AWS resource listing
-      Policies:
-      - PolicyName: bastion
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
           - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
             Action:
-            - ec2:Describe*
-            - elasticloadbalancing:Describe*
-            - autoscaling:Describe*
-            - cloudwatch:ListMetrics
-            - cloudwatch:GetMetricStatistics
-            - cloudwatch:Describe*
-            Resource: "*"
-
-  # Bind the BastionRole to a profile for the VM instance.
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: bastion
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ec2:Describe*'
+                  - 'elasticloadbalancing:Describe*'
+                  - 'autoscaling:Describe*'
+                  - 'cloudwatch:ListMetrics'
+                  - 'cloudwatch:GetMetricStatistics'
+                  - 'cloudwatch:Describe*'
+                Resource: '*'
   BastionInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
+    Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      Path: "/"
+      Path: /
       Roles:
-      - !Ref BastionRole
-
-  # Open up port 22 for SSH for the bastion host
+        - !Ref BastionRole
   BastionSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Enable SSH access via port 22
       VpcId: !Ref VPC
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: '22'
-        ToPort: '22'
-        CidrIp: !Ref AdminIngressLocation
-      - IpProtocol: tcp
-        FromPort: '80'
-        ToPort: '80'
-        CidrIp: !Ref AdminIngressLocation
-
-  # Install a CloudWatch logging group for system logs for each instance
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref AdminIngressLocation
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref AdminIngressLocation
   KubernetesLogGroup:
-    Type: AWS::Logs::LogGroup
+    Type: 'AWS::Logs::LogGroup'
     Properties:
-      LogGroupName: !Ref AWS::StackName
+      LogGroupName: !Ref 'AWS::StackName'
       RetentionInDays: 14
-
-  # This is an EC2 instance that will serve as our master node
   K8sMasterInstance:
-    Type: AWS::EC2::Instance
+    Type: 'AWS::EC2::Instance'
     DependsOn: ApiLoadBalancer
     Metadata:
-      AWS::CloudFormation::Init:
+      'AWS::CloudFormation::Init':
         configSets:
           master-setup: master-setup
         master-setup:
           files:
-            # Script that will allow for development kubernetes binaries to replace the pre-packaged AMI binaries.
-            "/tmp/kubernetes-override-binaries.sh":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-override-binaries.sh.in"
+            /tmp/kubernetes-override-binaries.sh:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-override-binaries.sh.in
               mode: '000755'
               context:
-                BaseBinaryUrl: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}bin/"
-
-            # Configuration file for the cloudwatch agent. The file is a Mustache template, and we're creating it with
-            # the below context (mainly to substitute in the AWS Stack Name for the logging group.)
-            "/tmp/kubernetes-awslogs.conf":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-awslogs.conf"
+                BaseBinaryUrl: !Sub >-
+                  https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}bin/
+            /tmp/kubernetes-awslogs.conf:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-awslogs.conf
               context:
-                StackName: !Ref AWS::StackName
-
-            # Installation script for the Cloudwatch agent
-            "/usr/local/aws/awslogs-agent-setup.py":
-              source: https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+                StackName: !Ref 'AWS::StackName'
+            /usr/local/aws/awslogs-agent-setup.py:
+              source: >-
+                https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
               mode: '000755'
-
-            # systemd init script for the Cloudwatch logs agent
-            "/etc/systemd/system/awslogs.service":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/awslogs.service"
-
-            # setup kubelet hostname
-            "/tmp/setup-kubelet-hostname.sh":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-kubelet-hostname.sh"
+            /etc/systemd/system/awslogs.service:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/awslogs.service
+            /tmp/setup-kubelet-hostname.sh:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-kubelet-hostname.sh
               mode: '000755'
-
-            # Setup script for initializing the Kubernetes master instance.  This is where most of the cluster
-            # initialization happens.  See scripts/setup-k8s-master.sh in the Quick Start repo for details.
-            "/tmp/setup-k8s-master.sh":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-k8s-master.sh.in"
+            /tmp/setup-k8s-master.sh:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-k8s-master.sh.in
               mode: '000755'
               context:
                 LoadBalancerDns: !GetAtt ApiLoadBalancer.DNSName
@@ -700,86 +646,71 @@ Resources:
                 ClusterToken: !GetAtt KubeadmToken.Token
                 ClusterDNSProvider: !Ref ClusterDNSProvider
                 NetworkingProvider: !Ref NetworkingProvider
-                NetworkingProviderUrl: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/${NetworkingProvider}.yaml"
-                DashboardUrl: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/dashboard.yaml"
-                StorageClassUrl: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/default.storageclass.yaml"
-                NetworkPolicyUrl: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/network-policy.yaml"
+                NetworkingProviderUrl: !Sub >-
+                  https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/${NetworkingProvider}.yaml
+                DashboardUrl: !Sub >-
+                  https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/dashboard.yaml
+                StorageClassUrl: !Sub >-
+                  https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/default.storageclass.yaml
+                NetworkPolicyUrl: !Sub >-
+                  https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/network-policy.yaml
                 ClusterInfoBucket: !Ref ClusterInfoBucket
-                Region: !Ref AWS::Region
-
-            # patch kube proxy
-            "/tmp/patch-kube-proxy.sh":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/patch-kube-proxy.sh"
+                Region: !Ref 'AWS::Region'
+            /tmp/patch-kube-proxy.sh:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/patch-kube-proxy.sh
               mode: '000755'
-
           commands:
-            # Override the AMI binaries with any kubelet/kubeadm/kubectl binaries in the S3 bucket
-            "00-kubernetes-override-binaries":
-              command: "/tmp/kubernetes-override-binaries.sh"
-            # Install the Cloudwatch agent with configuration for the current region and log group name
-            "01-cloudwatch-agent-setup":
-              command: !Sub "python /usr/local/aws/awslogs-agent-setup.py -n -r ${AWS::Region} -c /tmp/kubernetes-awslogs.conf"
-            # Enable the Cloudwatch service and launch it
-            "02-cloudwatch-service-config":
-              command: "systemctl enable awslogs.service && systemctl start awslogs.service"
-            # Setup kubelet hostname
-            "03-setup-kubelet-hostname":
-              command: "/tmp/setup-kubelet-hostname.sh"
-            # Run the master setup
-            "04-master-setup":
-              command: "/tmp/setup-k8s-master.sh"
-            "05-patch-kube-proxy":
-              command: "/tmp/patch-kube-proxy.sh"
+            00-kubernetes-override-binaries:
+              command: /tmp/kubernetes-override-binaries.sh
+            01-cloudwatch-agent-setup:
+              command: !Sub >-
+                python /usr/local/aws/awslogs-agent-setup.py -n -r
+                ${AWS::Region} -c /tmp/kubernetes-awslogs.conf
+            02-cloudwatch-service-config:
+              command: >-
+                systemctl enable awslogs.service && systemctl start
+                awslogs.service
+            03-setup-kubelet-hostname:
+              command: /tmp/setup-kubelet-hostname.sh
+            04-master-setup:
+              command: /tmp/setup-k8s-master.sh
+            05-patch-kube-proxy:
+              command: /tmp/patch-kube-proxy.sh
     Properties:
-      # Where the EC2 instance gets deployed geographically
       AvailabilityZone: !Ref AvailabilityZone
-      # Refers to the MasterInstanceProfile resource, which applies the IAM role for the master instance
-      # The IAM role allows us to create further AWS resources (like an EBS drive) from the cluster
-      # This is needed for the Kubernetes-AWS cloud-provider integration
       IamInstanceProfile: !Ref MasterInstanceProfile
-      # Type of instance; the default is m3.medium
       InstanceType: !Ref InstanceType
-      # Adds our SSH key to the instance
       KeyName: !Ref KeyName
       NetworkInterfaces:
-      - DeleteOnTermination: true
-        DeviceIndex: 0
-        SubnetId: !Ref PrivateSubnet
-        # Joins the ClusterSecGroup Security Group for cluster communication and SSH access
-        # The ClusterSecGroupCrossTalk rules allow all instances in the same stack to communicate internally
-        # The ClusterSecGroupAllow22 rules allow external communication on port 22 from a chosen CIDR range
-        # The ClusterSecGroupAllow6443FromLB rules allow HTTPS access to the load balancer on port 6443
-        GroupSet:
-        - !Ref ClusterSecGroup
-      # Designates a name for this EC2 instance that will appear in the instances list (k8s-master)
-      # Tags it with KubernetesCluster=<stackname> or chosen value (needed for cloud-provider's IAM roles)
+        - DeleteOnTermination: true
+          DeviceIndex: 0
+          SubnetId: !Ref PrivateSubnet
+          GroupSet:
+            - !Ref ClusterSecGroup
       Tags:
-      - Key: Name
-        Value: k8s-master
-      - Key: KubernetesCluster
-        Value: !Ref AWS::StackName
-        # Also tag it with kubernetes.io/cluster/clustername=owned, which is the newer convention for cluster resources
-      - Key:
-          Fn::Sub:
-          - "kubernetes.io/cluster/${ClusterID}"
-          - ClusterID: !Ref AWS::StackName
-        Value: 'owned'
-      # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-imageid
+        - Key: Name
+          Value: k8s-master
+        - Key: KubernetesCluster
+          Value: !Ref 'AWS::StackName'
+        - Key:
+            'Fn::Sub':
+              - 'kubernetes.io/cluster/${ClusterID}'
+              - ClusterID: !Ref 'AWS::StackName'
+          Value: owned
       ImageId:
-        Fn::FindInMap:
-        - RegionMap
-        - !Ref AWS::Region
-        - '64'
+        'Fn::FindInMap':
+          - RegionMap
+          - !Ref 'AWS::Region'
+          - '64'
       BlockDeviceMappings:
-      - DeviceName: '/dev/sda1'
-        Ebs:
-          VolumeSize: !Ref DiskSizeGb
-          VolumeType: gp2
-      # The userdata script is launched on startup, but contains only the commands that call out to cfn-init, which runs
-      # the commands in the metadata above, and cfn-signal, which signals when the initialization is complete.
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: !Ref DiskSizeGb
+            VolumeType: gp2
       UserData:
-        Fn::Base64:
-          Fn::Sub: |
+        'Fn::Base64':
+          'Fn::Sub': |
             #!/bin/bash
             set -o xtrace
 
@@ -801,34 +732,31 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M
-
-  # IAM role for Lambda function for generating kubeadm token
   LambdaExecutionRole:
-    Type: "AWS::IAM::Role"
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
-        - Effect: "Allow"
-          Principal:
-            Service: ["lambda.amazonaws.com"]
-          Action: "sts:AssumeRole"
-      Path: "/"
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
       Policies:
-      - PolicyName: "lambda_policy"
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-          - Effect: "Allow"
-            Action:
-            - "logs:CreateLogGroup"
-            - "logs:CreateLogStream"
-            - "logs:PutLogEvents"
-            Resource: "arn:aws:logs:*:*:*"
-
-  # Lambda Function for generating the kubeadm token
+        - PolicyName: lambda_policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:*'
   GenKubeadmToken:
-    Type: "AWS::Lambda::Function"
+    Type: 'AWS::Lambda::Function'
     Properties:
       Code:
         ZipFile: |
@@ -846,166 +774,139 @@ Resources:
               responseData['Token'] = token
               cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
               return token
-      Handler: "index.handler"
-      Runtime: "python2.7"
-      Timeout: "5"
+      Handler: index.handler
+      Runtime: python2.7
+      Timeout: '5'
       Role: !GetAtt LambdaExecutionRole.Arn
-
-  # A Custom resource that uses the lambda function to generate our cluster token
   KubeadmToken:
-    Type: "Custom::GenerateToken"
-    Version: "1.0"
+    Type: 'Custom::GenerateToken'
+    Version: '1.0'
     Properties:
       ServiceToken: !GetAtt GenKubeadmToken.Arn
-
-  # This is a CloudWatch alarm https://aws.amazon.com/cloudwatch/
-  # If the master node is unresponsive for 10 minutes, AWS will attempt to recover it
-  # It will preserve the original IP, which is important for Kubernetes networking
-  # Based on http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/quickref-cloudwatch.html#cloudwatch-sample-recover-instance
   RecoveryTestAlarm:
-    Type: AWS::CloudWatch::Alarm
+    Type: 'AWS::CloudWatch::Alarm'
     Properties:
-      AlarmDescription: Trigger a recovery when instance status check fails for 10
-        consecutive minutes.
+      AlarmDescription: >-
+        Trigger a recovery when instance status check fails for 10 consecutive
+        minutes.
       Namespace: AWS/EC2
       MetricName: StatusCheckFailed_System
       Statistic: Minimum
-      # 60-second periods (1 minute)
       Period: '60'
-      # 5-minute check-ins
       EvaluationPeriods: '10'
       ComparisonOperator: GreaterThanThreshold
       Threshold: '0'
-      # This is the call that actually tries to recover the instance
       AlarmActions:
-        - !Sub "arn:aws:automate:${AWS::Region}:ec2:recover"
-      # Applies this alarm to our K8sMasterInstance
+        - !Sub 'arn:aws:automate:${AWS::Region}:ec2:recover'
       Dimensions:
-      - Name: InstanceId
-        Value: !Ref K8sMasterInstance
-
-  # This is the Auto Scaling Group that contains EC2 instances that are Kubernetes nodes
-  # http://docs.aws.amazon.com/autoscaling/latest/userguide/AutoScalingGroup.html
+        - Name: InstanceId
+          Value: !Ref K8sMasterInstance
   K8sNodeGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
     DependsOn: K8sMasterInstance
     CreationPolicy:
       ResourceSignal:
-        # Ensure at least <K8sNodeCapacity> nodes have signaled success before
-        # this resource is considered created.
         Count: !Ref K8sNodeCapacity
         Timeout: PT10M
     Properties:
-      # Where the EC2 instance gets deployed geographically
       AvailabilityZones:
-      - !Ref AvailabilityZone
-      # Refers to the K8sNodeCapacity parameter, which specifies the number of nodes (1-20)
+        - !Ref AvailabilityZone
       DesiredCapacity: !Ref K8sNodeCapacity
-      # Refers to the LaunchConfig, which has specific config details for the EC2 instances
       LaunchConfigurationName: !Ref LaunchConfig
-      # More cluster sizing
       MinSize: '1'
       MaxSize: '20'
-      # VPC Zone Identifier is the subnets to put the hosts in
       VPCZoneIdentifier:
         - !Ref PrivateSubnet
-      # Designates names for these EC2 instances that will appear in the instances list (k8s-node)
-      # Tags each node with KubernetesCluster=<stackname> or chosen value (needed for cloud-provider's IAM roles)
       Tags:
-      - Key: Name
-        Value: k8s-node
-        PropagateAtLaunch: 'true'
-      - Key: KubernetesCluster
-        Value: !Ref AWS::StackName
-        PropagateAtLaunch: 'true'
-        # Also tag it with kubernetes.io/cluster/clustername=owned, which is the newer convention for cluster resources
-      - Key:
-          Fn::Sub:
-          - "kubernetes.io/cluster/${ClusterID}"
-          - ClusterID: !Ref AWS::StackName
-        Value: 'owned'
-        PropagateAtLaunch: 'true'
-    # Tells the group how many instances to update at a time, if an update is applied
+        - Key: Name
+          Value: k8s-node
+          PropagateAtLaunch: 'true'
+        - Key: KubernetesCluster
+          Value: !Ref 'AWS::StackName'
+          PropagateAtLaunch: 'true'
+        - Key:
+            'Fn::Sub':
+              - 'kubernetes.io/cluster/${ClusterID}'
+              - ClusterID: !Ref 'AWS::StackName'
+          Value: owned
+          PropagateAtLaunch: 'true'
     UpdatePolicy:
       AutoScalingRollingUpdate:
         MinInstancesInService: '1'
         MaxBatchSize: '1'
-
-  # This tells AWS what kinds of servers we want in our Auto Scaling Group
   LaunchConfig:
-    Type: AWS::AutoScaling::LaunchConfiguration
+    Type: 'AWS::AutoScaling::LaunchConfiguration'
     Metadata:
-      AWS::CloudFormation::Init:
+      'AWS::CloudFormation::Init':
         configSets:
           node-setup: node-setup
         node-setup:
-          # (See comments in the master instance Metadata for details.)
           files:
-            "/tmp/kubernetes-override-binaries.sh":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-override-binaries.sh.in"
+            /tmp/kubernetes-override-binaries.sh:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-override-binaries.sh.in
               mode: '000755'
               context:
-                BaseBinaryUrl: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}bin/"
-            "/tmp/kubernetes-awslogs.conf":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-awslogs.conf"
+                BaseBinaryUrl: !Sub >-
+                  https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}bin/
+            /tmp/kubernetes-awslogs.conf:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/kubernetes-awslogs.conf
               context:
-                StackName: !Ref AWS::StackName
-            "/usr/local/aws/awslogs-agent-setup.py":
-              source: https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+                StackName: !Ref 'AWS::StackName'
+            /usr/local/aws/awslogs-agent-setup.py:
+              source: >-
+                https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
               mode: '000755'
-            "/etc/systemd/system/awslogs.service":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/awslogs.service"
-            "/tmp/setup-kubelet-hostname.sh":
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-kubelet-hostname.sh"
+            /etc/systemd/system/awslogs.service:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/awslogs.service
+            /tmp/setup-kubelet-hostname.sh:
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-kubelet-hostname.sh
               mode: '000755'
-            "/tmp/setup-k8s-node.sh":
+            /tmp/setup-k8s-node.sh:
               mode: '000755'
-              source: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-k8s-node.sh.in"
+              source: !Sub >-
+                https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/setup-k8s-node.sh.in
               context:
                 K8sMasterPrivateIp: !GetAtt K8sMasterInstance.PrivateIp
                 ClusterToken: !GetAtt KubeadmToken.Token
                 ClusterInfoBucket: !Ref ClusterInfoBucket
-
           commands:
-            "00-kubernetes-override-binaries":
-              command: "/tmp/kubernetes-override-binaries.sh"
-            "01-cloudwatch-agent-setup":
-              command: !Sub "python /usr/local/aws/awslogs-agent-setup.py -n -r ${AWS::Region} -c /tmp/kubernetes-awslogs.conf"
-            "02-cloudwatch-service-config":
-              command: "systemctl enable awslogs.service && systemctl start awslogs.service"
-            "03-setup-kubelet-hostname":
-              command: "/tmp/setup-kubelet-hostname.sh"
-            "04-k8s-setup-node":
-              command: "/tmp/setup-k8s-node.sh"
+            00-kubernetes-override-binaries:
+              command: /tmp/kubernetes-override-binaries.sh
+            01-cloudwatch-agent-setup:
+              command: !Sub >-
+                python /usr/local/aws/awslogs-agent-setup.py -n -r
+                ${AWS::Region} -c /tmp/kubernetes-awslogs.conf
+            02-cloudwatch-service-config:
+              command: >-
+                systemctl enable awslogs.service && systemctl start
+                awslogs.service
+            03-setup-kubelet-hostname:
+              command: /tmp/setup-kubelet-hostname.sh
+            04-k8s-setup-node:
+              command: /tmp/setup-k8s-node.sh
     Properties:
-      # Refers to the NodeInstanceProfile resource, which applies the IAM role for the nodes
-      # The IAM role allows us to create further AWS resources (like an EBS drive) from the cluster
-      # This is needed for the Kubernetes-AWS cloud-provider integration
       IamInstanceProfile: !Ref NodeInstanceProfile
-      # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-imageid
       ImageId:
-        Fn::FindInMap:
-        - RegionMap
-        - !Ref AWS::Region
-        - '64'
+        'Fn::FindInMap':
+          - RegionMap
+          - !Ref 'AWS::Region'
+          - '64'
       BlockDeviceMappings:
-      - DeviceName: '/dev/sda1'
-        Ebs:
-          VolumeSize: !Ref DiskSizeGb
-          VolumeType: gp2
-      # Type of instance; the default is m3.medium
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: !Ref DiskSizeGb
+            VolumeType: gp2
       InstanceType: !Ref InstanceType
-      # Adds our SSH key to the instance
       KeyName: !Ref KeyName
-      # Join the cluster security group so that we can customize the access
-      # control (See the ClusterSecGroup resource for details)
       SecurityGroups:
-      - !Ref ClusterSecGroup
-      # The userdata script is launched on startup, but contains only the commands that call out to cfn-init, which runs
-      # the commands in the metadata above, and cfn-signal, which signals when the initialization is complete.
+        - !Ref ClusterSecGroup
       UserData:
-        Fn::Base64:
-          Fn::Sub: |
+        'Fn::Base64':
+          'Fn::Sub': |
             #!/bin/bash
             set -o xtrace
 
@@ -1021,236 +922,202 @@ Resources:
               --stack '${AWS::StackName}' \
               --region '${AWS::Region}' \
               --resource K8sNodeGroup
-
-  # Define the (one) security group for all machines in the cluster.  Keeping
-  # just one security group helps with k8s's cloud-provider=aws integration so
-  # that it knows what security group to manage.
   ClusterSecGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Security group for all machines in the cluster
       VpcId: !Ref VPC
-      # Security Groups must be tagged with KubernetesCluster=<cluster> so that
-      # they can coexist in the same VPC
       Tags:
-      - Key: KubernetesCluster
-        Value: !Ref AWS::StackName
-      - Key:
-          Fn::Sub:
-          - "kubernetes.io/cluster/${ClusterID}"
-          - ClusterID: !Ref AWS::StackName
-        Value: 'owned'
-      - Key: Name
-        Value: k8s-cluster-security-group
-
-  # Permissions we add to the main security group:
-  # - Ensure cluster machines can talk to one another
+        - Key: KubernetesCluster
+          Value: !Ref 'AWS::StackName'
+        - Key:
+            'Fn::Sub':
+              - 'kubernetes.io/cluster/${ClusterID}'
+              - ClusterID: !Ref 'AWS::StackName'
+          Value: owned
+        - Key: Name
+          Value: k8s-cluster-security-group
   ClusterSecGroupCrossTalk:
-    Type: AWS::EC2::SecurityGroupIngress
+    Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !Ref ClusterSecGroup
       SourceSecurityGroupId: !Ref ClusterSecGroup
       IpProtocol: '-1'
       FromPort: '0'
       ToPort: '65535'
-
-  # - Open up port 22 for SSH into each machine
-  # The allowed locations are chosen by the user in the SSHLocation parameter
   ClusterSecGroupAllow22:
     Metadata:
       Comment: Open up port 22 for SSH into each machine
-    Type: AWS::EC2::SecurityGroupIngress
+    Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !Ref ClusterSecGroup
       IpProtocol: tcp
       FromPort: '22'
       ToPort: '22'
-      CidrIp: !Sub "${BastionHost.PrivateIp}/32"
-
-  # Allow the apiserver load balancer to talk to the cluster on port 6443
+      CidrIp: !Sub '${BastionHost.PrivateIp}/32'
   ClusterSecGroupAllow6443FromLB:
     Metadata:
       Comment: Open up port 6443 for load balancing the API server
-    Type: AWS::EC2::SecurityGroupIngress
+    Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !Ref ClusterSecGroup
       IpProtocol: tcp
       FromPort: '6443'
       ToPort: '6443'
       SourceSecurityGroupId: !Ref ApiLoadBalancerSecGroup
-
-  # Allow the bastion host to talk to the cluster on port 6443
   ClusterSecGroupAllow6443FromBastion:
     Metadata:
       Comment: Open up port 6443 for bastion to connect to the API server
-    Type: AWS::EC2::SecurityGroupIngress
+    Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !Ref ClusterSecGroup
       IpProtocol: tcp
       FromPort: '6443'
       ToPort: '6443'
       SourceSecurityGroupId: !Ref BastionSecurityGroup
-
-  # IAM role for nodes http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
   NodeRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-          - sts:AssumeRole
-      Path: "/"
-      # IAM policy for nodes that allows specific AWS resource listing and creation
-      # http://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
       Policies:
-      - PolicyName: node
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - ec2:Describe*
-            - ecr:GetAuthorizationToken
-            - ecr:BatchCheckLayerAvailability
-            - ecr:GetDownloadUrlForLayer
-            - ecr:GetRepositoryPolicy
-            - ecr:DescribeRepositories
-            - ecr:ListImages
-            - ecr:BatchGetImage
-            Resource: "*"
-
-      - PolicyName: cwlogs
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-            - logs:DescribeLogStreams
-            Resource: !Sub ["${LogGroupArn}:*", LogGroupArn: !GetAtt KubernetesLogGroup.Arn]
-
-      - PolicyName: discoverBucketWrite
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - s3:GetObject
-            Resource: !Sub "arn:aws:s3:::${ClusterInfoBucket}/cluster-info.yaml"
-
-  # Resource that creates the node IAM role
+        - PolicyName: node
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ec2:Describe*'
+                  - 'ecr:GetAuthorizationToken'
+                  - 'ecr:BatchCheckLayerAvailability'
+                  - 'ecr:GetDownloadUrlForLayer'
+                  - 'ecr:GetRepositoryPolicy'
+                  - 'ecr:DescribeRepositories'
+                  - 'ecr:ListImages'
+                  - 'ecr:BatchGetImage'
+                Resource: '*'
+        - PolicyName: cwlogs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogStreams'
+                Resource: !Sub 
+                  - '${LogGroupArn}:*'
+                  - LogGroupArn: !GetAtt KubernetesLogGroup.Arn
+        - PolicyName: discoverBucketWrite
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                Resource: !Sub 'arn:aws:s3:::${ClusterInfoBucket}/cluster-info.yaml'
   NodeInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
+    Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      Path: "/"
+      Path: /
       Roles:
-      - !Ref NodeRole
-
-  # IAM role for the master node http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
+        - !Ref NodeRole
   MasterRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-          - sts:AssumeRole
-      Path: "/"
-      # IAM policy for the master node that allows specific AWS resource listing and creation
-      # More permissive than the node role (it allows load balancer creation)
-      # http://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
       Policies:
-      - PolicyName: master
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - ec2:*
-            - elasticloadbalancing:*
-            - ecr:GetAuthorizationToken
-            - ecr:BatchCheckLayerAvailability
-            - ecr:GetDownloadUrlForLayer
-            - ecr:GetRepositoryPolicy
-            - ecr:DescribeRepositories
-            - ecr:ListImages
-            - ecr:BatchGetImage
-            - autoscaling:DescribeAutoScalingGroups
-            - autoscaling:UpdateAutoScalingGroup
-            Resource: "*"
-
-      - PolicyName: cwlogs
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-            - logs:DescribeLogStreams
-            Resource: !Sub ["${LogGroupArn}:*", LogGroupArn: !GetAtt KubernetesLogGroup.Arn]
-
-      - PolicyName: discoverBucketWrite
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - s3:PutObject
-            Resource: !Sub "arn:aws:s3:::${ClusterInfoBucket}/cluster-info.yaml"
-
-  # Bind the MasterRole to a profile for the VM instance.
+        - PolicyName: master
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ec2:*'
+                  - 'elasticloadbalancing:*'
+                  - 'ecr:GetAuthorizationToken'
+                  - 'ecr:BatchCheckLayerAvailability'
+                  - 'ecr:GetDownloadUrlForLayer'
+                  - 'ecr:GetRepositoryPolicy'
+                  - 'ecr:DescribeRepositories'
+                  - 'ecr:ListImages'
+                  - 'ecr:BatchGetImage'
+                  - 'autoscaling:DescribeAutoScalingGroups'
+                  - 'autoscaling:UpdateAutoScalingGroup'
+                Resource: '*'
+        - PolicyName: cwlogs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogStreams'
+                Resource: !Sub 
+                  - '${LogGroupArn}:*'
+                  - LogGroupArn: !GetAtt KubernetesLogGroup.Arn
+        - PolicyName: discoverBucketWrite
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                Resource: !Sub 'arn:aws:s3:::${ClusterInfoBucket}/cluster-info.yaml'
   MasterInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
+    Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      Path: "/"
+      Path: /
       Roles:
-      - !Ref MasterRole
-
-  # Create a placeholder load balancer for the API server. Backend instances will be added by the master itself on the
-  # first boot in the startup script above.
+        - !Ref MasterRole
   ApiLoadBalancer:
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Type: 'AWS::ElasticLoadBalancing::LoadBalancer'
     DependsOn: VPCGatewayAttachment
     Properties:
       Scheme: !Ref LoadBalancerType
       Listeners:
-      - Protocol: TCP
-        InstancePort: 6443
-        InstanceProtocol: TCP
-        LoadBalancerPort: 443
+        - Protocol: TCP
+          InstancePort: 6443
+          InstanceProtocol: TCP
+          LoadBalancerPort: 443
       ConnectionSettings:
         IdleTimeout: 3600
       Subnets:
-      - !Ref PublicSubnet
+        - !Ref PublicSubnet
       SecurityGroups:
-      - !Ref ApiLoadBalancerSecGroup
+        - !Ref ApiLoadBalancerSecGroup
       Tags:
-      - Key: KubernetesCluster
-        Value: !Ref AWS::StackName
-      - Key:
-          Fn::Sub:
-          - "kubernetes.io/cluster/${ClusterID}"
-          - ClusterID: !Ref AWS::StackName
-        Value: 'owned'
-      - Key: 'kubernetes.io/service-name'
-        Value: 'kube-system/apiserver-public'
-
-  # Security group to allow public access to port 443
+        - Key: KubernetesCluster
+          Value: !Ref 'AWS::StackName'
+        - Key:
+            'Fn::Sub':
+              - 'kubernetes.io/cluster/${ClusterID}'
+              - ClusterID: !Ref 'AWS::StackName'
+          Value: owned
+        - Key: kubernetes.io/service-name
+          Value: kube-system/apiserver-public
   ApiLoadBalancerSecGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Security group for API server load balancer
       VpcId: !Ref VPC
@@ -1260,44 +1127,42 @@ Resources:
         ToPort: 443
         IpProtocol: tcp
       Tags:
-      - Key: Name
-        Value: apiserver-lb-security-group
-
-  # Give the cleanup lambda function the necessary policy.
+        - Key: Name
+          Value: apiserver-lb-security-group
   CleanupClusterInfoRole:
-    Type: "AWS::IAM::Role"
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
-        - Effect: "Allow"
-          Principal:
-            Service: ["lambda.amazonaws.com"]
-          Action: "sts:AssumeRole"
-      Path: "/"
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
       Policies:
-      - PolicyName: s3upload
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-            Resource: arn:aws:logs:*:*:*
-          - Effect: Allow
-            Action: ['s3:DeleteObject']
-            Resource: [!Sub "arn:aws:s3:::${ClusterInfoBucket}/cluster-info.yaml"]
-
-  # CleanupClusterInfo backs the custom resource defined below.
-  # When the custom resource gets created, deleted or updated this function will be executed.
+        - PolicyName: s3upload
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:*'
+              - Effect: Allow
+                Action:
+                  - 's3:DeleteObject'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${ClusterInfoBucket}/cluster-info.yaml'
   CleanupClusterInfo:
-    Type: "AWS::Lambda::Function"
+    Type: 'AWS::Lambda::Function'
     Properties:
       Code:
         ZipFile:
-          Fn::Sub: |
+          'Fn::Sub': |
             import boto3
             import cfnresponse
 
@@ -1315,115 +1180,102 @@ Resources:
                 except Exception as e:
                     print(e)
                 cfnresponse.send(event, context, cfnresponse.FAILED, {})
-      Handler: "index.lambda_handler"
-      Runtime: "python3.6"
-      Timeout: "5"
+      Handler: index.lambda_handler
+      Runtime: python3.6
+      Timeout: '5'
       Role: !GetAtt CleanupClusterInfoRole.Arn
-
   CleanupClusterInfoOnDelete:
-    Type: "Custom::CleanupClusterInfo"
+    Type: 'Custom::CleanupClusterInfo'
     Properties:
       ServiceToken: !GetAtt CleanupClusterInfo.Arn
-
   Group:
-    Type: AWS::IAM::Group
+    Type: 'AWS::IAM::Group'
     Properties:
       GroupName: Students
-      Path: "/"
+      Path: /
       Policies:
-      - PolicyName: students-policy
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - ec2:Describe*
-            Resource: "*"
-            Condition:
-              StringEquals:
-                ec2:Region: us-west-2
-          - Effect: Allow
-            Action:
-            - elasticloadbalancing:DescribeLoadBalancers
-            Resource: "*"
+        - PolicyName: students-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ec2:Describe*'
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    'ec2:Region': us-west-2
+              - Effect: Allow
+                Action:
+                  - 'elasticloadbalancing:DescribeLoadBalancers'
+                Resource: '*'
   User:
-    Type: AWS::IAM::User
+    Type: 'AWS::IAM::User'
     Properties:
       LoginProfile:
         Password:
-          Fn::FindInMap:
+          'Fn::FindInMap':
+            - UserConfig
+            - Login
+            - Pass
+      Path: /
+      Groups:
+        - Students
+      UserName:
+        'Fn::FindInMap':
           - UserConfig
           - Login
-          - Pass
-      Path: "/"
-      Groups:
-      - Students
-      UserName:
-        Fn::FindInMap:
-        - UserConfig
-        - Login
-        - Name
-
-# Outputs are what AWS will show you after stack creation
-# Generally they let you easily access some information about the stack
-# like what IP address is assigned to your master node
-# Read Descriptions below for more detail
+          - Name
 Outputs:
-  # Outputs from VPC creation
   VPCID:
     Description: ID of the newly-created EC2 VPC.
     Value: !Ref VPC
-
   BastionHostPublicIp:
     Description: IP Address of the bastion host for the newly-created EC2 VPC.
     Value: !GetAtt BastionHost.PublicIp
-
   BastionHostPublicDNS:
     Description: Public DNS FQDN of the bastion host for the newly-created EC2 VPC.
     Value: !GetAtt BastionHost.PublicDnsName
-
   SSHProxyCommand:
-    Description: Run locally - SSH command to proxy to the master instance
-      through the bastion host, to access port 8080 (command to SSH to the master Kubernetes node).
+    Description: >-
+      Run locally - SSH command to proxy to the master instance through the
+      bastion host, to access port 8080 (command to SSH to the master Kubernetes
+      node).
     Value: !Sub >-
-      SSH_KEY="path/to/${KeyName}.pem";
-      ssh
-      -i $SSH_KEY
-      -A -L8080:localhost:8080
-      -o ProxyCommand="ssh -i \"${!SSH_KEY}\" ubuntu@${BastionHost.PublicIp} nc %h %p"
-      ubuntu@${K8sMasterInstance.PrivateIp}
-
+      SSH_KEY="path/to/${KeyName}.pem"; ssh -i $SSH_KEY -A -L8080:localhost:8080
+      -o ProxyCommand="ssh -i \"${!SSH_KEY}\" ubuntu@${BastionHost.PublicIp} nc
+      %h %p" ubuntu@${K8sMasterInstance.PrivateIp}
   GetKubeConfigCommand:
-    Description: Run locally - SCP command to download the Kubernetes configuration
-      file for accessing the new cluster via kubectl, a Kubernetes command line tool.
+    Description: >-
+      Run locally - SCP command to download the Kubernetes configuration file
+      for accessing the new cluster via kubectl, a Kubernetes command line tool.
       Creates a "kubeconfig" file in the current directory. Then, you can run
-      "export KUBECONFIG=$(pwd)/kubeconfig" to ensure kubectl uses this configuration file.
-      About kubectl - https://kubernetes.io/docs/user-guide/prereqs/
+      "export KUBECONFIG=$(pwd)/kubeconfig" to ensure kubectl uses this
+      configuration file. About kubectl -
+      https://kubernetes.io/docs/user-guide/prereqs/
     Value: !Sub >-
-      SSH_KEY="path/to/${KeyName}.pem";
-      scp
-      -i $SSH_KEY
-      -o ProxyCommand="ssh -i \"${!SSH_KEY}\" ubuntu@${BastionHost.PublicIp} nc %h %p"
+      SSH_KEY="path/to/${KeyName}.pem"; scp -i $SSH_KEY -o ProxyCommand="ssh -i
+      \"${!SSH_KEY}\" ubuntu@${BastionHost.PublicIp} nc %h %p"
       ubuntu@${K8sMasterInstance.PrivateIp}:~/kubeconfig ./kubeconfig
-
-  # Outputs forwarded from the k8s template
   MasterInstanceId:
     Description: InstanceId of the master EC2 instance.
     Value: !Ref K8sMasterInstance
-
   MasterPrivateIp:
     Description: Private IP address of the master.
     Value: !GetAtt K8sMasterInstance.PrivateIp
-
   NodeGroupInstanceId:
     Description: InstanceId of the newly-created NodeGroup.
     Value: !Ref K8sNodeGroup
-
   JoinNodes:
     Description: Command to join more nodes to this cluster.
-    Value: !Sub "aws cp s3://${ClusterInfoBucket}/cluster-info.yaml /tmp/cluster-info.yaml && kubeadm join --node-name=\"$(hostname -f 2>/dev/null || curl http://169.254.169.254/latest/meta-data/local-hostname)\" --token=${KubeadmToken.Token} --discovery-file=/tmp/cluster-info.yaml ${K8sMasterInstance.PrivateIp}:6443"
-
+    Value: !Sub >-
+      aws cp s3://${ClusterInfoBucket}/cluster-info.yaml /tmp/cluster-info.yaml
+      && kubeadm join --node-name="$(hostname -f 2>/dev/null || curl
+      http://169.254.169.254/latest/meta-data/local-hostname)"
+      --token=${KubeadmToken.Token} --discovery-file=/tmp/cluster-info.yaml
+      ${K8sMasterInstance.PrivateIp}:6443
   NextSteps:
-    Description: Verify your cluster and deploy a test application. Instructions -
+    Description: >-
+      Verify your cluster and deploy a test application. Instructions -
       http://jump.heptio.com/aws-qs-next
-    Value: http://jump.heptio.com/aws-qs-next
+    Value: 'http://jump.heptio.com/aws-qs-next'
