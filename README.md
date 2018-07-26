@@ -2,6 +2,8 @@
 
 Lab to illustrate Kubernetes security concepts
 
+![Kubernetes Security Primitives](https://user-images.githubusercontent.com/3911650/43289132-3a0a1e0e-90e7-11e8-9891-3ec196cbec7b.png)
+
 ## Getting Started
 
 Deploy the CloudFormation `infrastructure/cloudformation.json` template. The template creates a user with the following credentials and minimal required permisisons to complete the Lab:
